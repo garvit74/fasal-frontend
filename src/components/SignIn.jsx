@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { TextField, Button, Container, Card, CardContent, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { signInUser } from '../api';  // Importing the signIn function from the api file
+
 
 function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const navigate = useNavigate();
+  
   const handleSignIn = async () => {
     try {
       const response = await signInUser(email, password);
-      console.log('Signed In Successfully:', response);
+      navigate('/');
+      window.location.reload();
       // Redirect or show success message based on response
     } catch (error) {
       console.error("Error signing in:", error);

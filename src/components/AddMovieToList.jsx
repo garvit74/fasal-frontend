@@ -8,14 +8,18 @@ import {
   Button,
 } from "@mui/material";
 import axios from "axios";
+import { addMovieToList } from '../api';
+import { useParams } from "react-router-dom";
+
 
 const YOUR_OMDB_API_KEY=process.env.REACT_APP_API_KEY;
 
 function AddMovieToList() {
+  const { listId } = useParams();
   const [searchTerm, setSearchTerm] = useState("");
   const [movies, setMovies] = useState([]);
   const [lists, setLists] = useState([]);
-
+  const token = localStorage.getItem('token'); // Assumes token is stored in localStorage
   const searchMovies = async () => {
     const response = await axios.get(
       `http://www.omdbapi.com/?s=${searchTerm}&apikey=${YOUR_OMDB_API_KEY}`
@@ -23,8 +27,21 @@ function AddMovieToList() {
     setMovies(response.data.Search);
   };
 
-  const addMovieToList = (movie, listId) => {
-    // Logic to add movie to a list in Firestore
+  const handleAddMovieToList = async (movie) => {
+    try {
+      // Prepare the movie object as expected by the backend
+      const movieToAdd = {
+        title: movie.Title,
+        year: movie.Year,
+        imdbID: movie.imdbID,
+        poster: movie.Poster // Assumes Poster is available from the API response
+      };
+      const result = await addMovieToList(movieToAdd, listId, token);// Log the response from the backend
+      alert('Movie added successfully');
+    } catch (error) {
+      alert('Failed to add movie');
+      console.error(error);
+    }
   };
 
   return (
@@ -56,7 +73,7 @@ function AddMovieToList() {
                 <p>{movie.Year}</p>
                 <Button
                   variant="contained"
-                  onClick={() => addMovieToList(movie, "Your List Id")}
+                  onClick={() => handleAddMovieToList(movie)}
                 >
                   Add to List
                 </Button>

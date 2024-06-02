@@ -1,143 +1,131 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  Typography,
+  Box,
   Container,
   TextField,
   Button,
+  FormControlLabel,
+  Switch,
   Grid,
   Card,
   CardContent,
-  Typography,
 } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
-
-const YOUR_OMDB_API_KEY = process.env.REACT_APP_API_KEY;
-
-const defaultPoster =
-  "https://www.reelviews.net/resources/img/default_poster.jpg";
+import { getallLists, deleteList } from "../api"; // Adjust the path and import deleteList function as needed
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [publicLists, setPublicLists] = useState([]);
-  const [error, setError] = useState("");
-
+  const [lists, setLists] = useState([]); // State to store the list data
   const navigate = useNavigate();
+  const token = localStorage.getItem("token"); // Retrieve the token from local storage
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/signin");
-    }
-  }, [navigate]);
+    const fetchLists = async () => {
+      if (!token) {
+        return;
+      }
 
-  const user = []; // Fetch details of the user that has signed in
+      try {
+        const lists = await getallLists(token); // Assuming 'all' can be used to fetch all lists
+        setLists(lists); // Set the lists in state
+      } catch (error) {
+        console.error("Error fetching lists:", error.response || error.message);
+      }
+    };
 
-  useEffect(() => {
-    // Here you might want to fetch user details and public lists
-  }, []);
+    fetchLists();
+  }, []); // Dependency array is empty, so this runs only once when the component mounts
+  
+  const handleViewDetails = (listId) => {
+    navigate(`/list/${listId}`);
+  };
 
-  const handleSearch = async () => {
+
+  const handleDeleteList = async (listId) => {
     try {
-      const response = await fetch(
-        `https://www.omdbapi.com/?s=${searchTerm}&apikey=${YOUR_OMDB_API_KEY}`
-      );
-      if (!response.ok) throw new Error("Failed to fetch movies");
-      const data = await response.json();
-      if (data.Error) throw new Error(data.Error);
-      setSearchResults(data.Search || []);
-    } catch (err) {
-      setError(err.message);
+      // Call the deleteList API function passing the listId
+      await deleteList(listId, token);
+      // Remove the deleted list from the state
+      setLists((prevLists) => prevLists.filter((list) => list._id !== listId));
+    } catch (error) {
+      console.error("Error deleting list:", error.response || error.message);
     }
   };
 
+  // Filter lists into public and private
+  const publicLists = lists.filter((list) => list.isPublic);
+  const privateLists = lists.filter((list) => !list.isPublic);
+
   return (
-    <Container sx={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-      {error && <Typography color="error">{error}</Typography>}
-      {user ? (
-        <>
-          <h2>Search Movies</h2>
-          <Container sx={{ display: "flex", gap: "10px" }}>
-            <TextField
-              label="Search Movies"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              fullWidth
-            />
-            <Button variant="contained" onClick={handleSearch}>
-              Search
-            </Button>
-          </Container>
-          <Grid container spacing={3}>
-            {searchResults.map((movie) => (
-              <Grid item xs={12} sm={6} md={4} key={movie.imdbID}>
-                <Card sx={{ height: "100%" }}>
-                  {" "}
-                  {/* Set fixed height or maxHeight if preferred */}
-                  <CardContent
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                    }}
+    <Box sx={{ padding: 2 }}>
+      <Typography variant="h4" component="h1" gutterBottom>
+        My Lists
+      </Typography>
+      <Box>
+        <Typography variant="h5" component="h2" gutterBottom>
+          Public Lists
+        </Typography>
+        <Grid container spacing={3}>
+          {publicLists?.map((list) => (
+            <Grid item xs={12} sm={6} md={4} key={list._id}>
+              <Card onClick={()=>handleViewDetails(list._id)}>
+                <CardContent>
+                  <h3>{list.name}</h3>
+                  <p>{list.isPublic ? "Public" : "Private"}</p>
+                  <Button
+                    variant="contained"
+                    onClick={() => navigate(`/addMovies/${list._id}`)}
+                    sx={{ marginRight: 1 }} // Adding margin to the right to create space
                   >
-                    <img
-                      src={movie.Poster !== null ? movie.Poster : defaultPoster}
-                      alt={`${movie.Title} Poster`}
-                      style={{ width: "100%", height: 300, objectFit: "cover" }} // Fixed image height and cover to maintain aspect ratio
-                    />
-                    <Typography variant="h5" gutterBottom>
-                      {movie.Title}
-                    </Typography>
-                    <Typography variant="subtitle1" gutterBottom>
-                      {movie.Year}
-                    </Typography>
-                    <Button
-                      component={Link}
-                      to={`/movie/${movie.imdbID}`}
-                      variant="contained"
-                    >
-                      View Details
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </>
-      ) : (
-        <>
-          <h2>Public Movie Lists</h2>
-          <Grid container spacing={3}>
-            {publicLists.map((list) => (
-              <Grid item xs={12} sm={6} md={4} key={list.id}>
-                <Card sx={{ height: "100%" }}>
-                  {" "}
-                  {/* Set fixed height */}
-                  <CardContent
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                    }}
+                    Add Movies
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => handleDeleteList(list._id)}
+                    sx={{ marginLeft: 1 }} // Adding margin to the left to create space
                   >
-                    <Typography variant="h5" gutterBottom>
-                      {list.name}
-                    </Typography>
-                    <Button
-                      component={Link}
-                      to={`/list/${list.id}`}
-                      variant="contained"
-                    >
-                      View List
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </>
-      )}
-    </Container>
+                    Delete List
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+      <Box mt={4}>
+        <Typography variant="h5" component="h2" gutterBottom>
+          Private Lists
+        </Typography>
+        <Grid container spacing={3}>
+          {privateLists?.map((list) => (
+            <Grid item xs={12} sm={6} md={4} key={list._id}>
+              <Card onClick={()=>handleViewDetails(list._id)}>
+                <CardContent>
+                  <h3>{list.name}</h3>
+                  <p>{list.isPublic ? "Public" : "Private"}</p>
+                  <Button
+                    variant="contained"
+                    onClick={() => navigate(`/addMovies/${list._id}`)}
+                    sx={{ marginRight: 1 }} // Adding margin to the right to create space
+                  >
+                    Add Movies
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => handleDeleteList(list._id)}
+                    sx={{ marginLeft: 1 }} // Adding margin to the left to create space
+                  >
+                    Delete List
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    </Box>
   );
 };
 
