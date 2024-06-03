@@ -60,7 +60,7 @@ This is the frontend for the Movie Library web application. It allows users to s
 ## Screenshots 
 
 ### 1. Signup Page
-
+![Sign Up Page](https://github.com/garvit74/fasal-frontend/blob/main/Screenshots/signup.png)
 ### 2. Sign In Page
 
 ### 3. Home Page
