@@ -68,9 +68,9 @@ const Home = () => {
         <Grid container spacing={3}>
           {publicLists?.map((list) => (
             <Grid item xs={12} sm={6} md={4} key={list._id}>
-              <Card onClick={()=>handleViewDetails(list._id)}>
+              <Card >
                 <CardContent>
-                  <h3>{list.name}</h3>
+                  <h3 onClick={()=>handleViewDetails(list._id)} style={{ cursor: 'pointer' }}>{list.name}</h3>
                   <p>{list.isPublic ? "Public" : "Private"}</p>
                   <Button
                     variant="contained"
@@ -100,9 +100,9 @@ const Home = () => {
         <Grid container spacing={3}>
           {privateLists?.map((list) => (
             <Grid item xs={12} sm={6} md={4} key={list._id}>
-              <Card onClick={()=>handleViewDetails(list._id)}>
+              <Card >
                 <CardContent>
-                  <h3>{list.name}</h3>
+                  <h3 onClick={()=>handleViewDetails(list._id)} style={{ cursor: 'pointer' }}>{list.name}</h3>
                   <p>{list.isPublic ? "Public" : "Private"}</p>
                   <Button
                     variant="contained"

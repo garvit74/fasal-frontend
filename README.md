@@ -62,19 +62,19 @@ This is the frontend for the Movie Library web application. It allows users to s
 ### 1. Signup Page
 ![Sign Up Page](https://github.com/garvit74/fasal-frontend/blob/main/Screenshots/signup.png)
 ### 2. Sign In Page
-
+![Sign In Page](https://github.com/garvit74/fasal-frontend/blob/main/Screenshots/signin.png)
 ### 3. Home Page
-
+![Home Page](https://github.com/garvit74/fasal-frontend/blob/main/Screenshots/Home%20Page.png)
 ### 4. Search Page
-
+![Search Page](https://github.com/garvit74/fasal-frontend/blob/main/Screenshots/Search%20Page.png)
 ### 5. Create List Page
-
+![Create List](https://github.com/garvit74/fasal-frontend/blob/main/Screenshots/Create%20List.png)
 ### 6. List Details Page
-
+![List Details Page](https://github.com/garvit74/fasal-frontend/blob/main/Screenshots/List%20Details.png)
 ### 7. Movie Details Page
-
+![Movie Details Page](https://github.com/garvit74/fasal-frontend/blob/main/Screenshots/Movie%20Details%20Page.png)
 ### 8. Add Movies to List Page
-
+![Add Movies to List](https://github.com/garvit74/fasal-frontend/blob/main/Screenshots/AddMovietolist.png)
 
 ## Conclusion
 
